@@ -14,11 +14,10 @@ public:
 	void CreateCircle(b2BodyType type, float position[2], float radius, float density, float restitution, float friction, float scale);
 	void CreateLine(b2BodyType type, float position[2], float destination[2], float density, float restitution, float friction, float scale);
 
-	b2Body *Step(float32 timeStep = 1.0f / 60.0f, float32 velocityIterations = 8, float32 positionIterations = 3);
+	b2Body *Step(float32 timeStep = 1.0f / 60.0f, float32 velocityIterations = 10, float32 positionIterations = 8);
 
 private:
 
 	b2World *world;
 	b2Vec2 gravity;
-	std::list<b2Body*> *bodies;
 };

@@ -3,13 +3,11 @@
 PhysicsWorld::PhysicsWorld()
 {
 	world = new b2World(b2Vec2(0, -10));
-	bodies = new std::list<b2Body*>;
 }
 
 PhysicsWorld::PhysicsWorld(float gravity[2])
 {
 	world = new b2World(b2Vec2(gravity[0], gravity[1]));
-	bodies = new std::list<b2Body*>;
 }
 
 PhysicsWorld::~PhysicsWorld()
@@ -36,8 +34,6 @@ void PhysicsWorld::CreateBody(b2BodyType type, float position[2], float density,
 	fixture.friction = friction;
 
 	body->CreateFixture(&fixture);
-
-	bodies->push_back(body);
 }
 
 void PhysicsWorld::CreateBox(b2BodyType type, float position[2], float dimensions[2], float density, float restitution, float friction, float scale)
@@ -48,7 +44,6 @@ void PhysicsWorld::CreateBox(b2BodyType type, float position[2], float dimension
 	rectangle.SetAsBox((dimensions[0]/2)/scale, (dimensions[1]/2)/scale);
 
 	CreateBody(type, position, density, restitution, friction, scale, &rectangle);
-	
 }
 
 void PhysicsWorld::CreateCircle(b2BodyType type, float position[2], float radius, float density, float restitution, float friction, float scale)

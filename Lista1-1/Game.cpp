@@ -4,6 +4,7 @@ Game::Game()
 {
 	world = new PhysicsWorld();
 	window = new sf::RenderWindow();
+	window->setFramerateLimit(60);
 
 	createWindow();
 }
@@ -29,29 +30,24 @@ void Game::Update()
 
 void Game::Render()
 {
-	b2Body *bodies;
+	//Physics engine update tick
+	b2Body *bodies = world->Step();;
 
 	window->clear(sf::Color::White);
 
-	//Physics engine update tick
-	bodies = world->Step();
-
 	//Going through the bodies list and drawing each one at its updated position and rotation
 	for (b2Body *bodyIterator = bodies; bodyIterator != 0; bodyIterator = bodyIterator->GetNext()) {
-		sf::RectangleShape shape;
+		//for (b2Fixture *fixtureIterator = bodyIterator->GetFixtureList(); fixtureIterator != 0; fixtureIterator = fixtureIterator->GetNext()) {
+			sf::RectangleShape shape;
 
-		/*sf::Sprite sprite;
-		sprite.setOrigin(16.0f, 16.0f);
-		sprite.setPosition(SCALE * bodyIterator->GetPosition().x, SCALE * bodyIterator->GetPosition().y);
-		sprite.setRotation(bodyIterator->GetAngle() * 180 / b2_pi);*/
+			shape.setOrigin(16.0f, 16.0f);
+			shape.setPosition(SCALE * bodyIterator->GetPosition().x, SCALE * bodyIterator->GetPosition().y);
+			shape.setRotation(bodyIterator->GetAngle() * 180 / b2_pi);
+			shape.setSize(sf::Vector2<float32>(SCALE * bodyIterator->GetTransform().p.x, SCALE * bodyIterator->GetTransform().p.y));
+			shape.setFillColor(sf::Color::Black);
 
-		shape.setOrigin(16.0f, 16.0f);
-		shape.setPosition(SCALE * bodyIterator->GetPosition().x, SCALE * bodyIterator->GetPosition().y);
-		shape.setRotation(bodyIterator->GetAngle() * 180 / b2_pi);
-		shape.setSize(sf::Vector2<float32>(SCALE * bodyIterator->GetTransform().p.x, SCALE * bodyIterator->GetTransform().p.y));
-		shape.setFillColor(sf::Color::Black);
-
-		window->draw(shape);
+			window->draw(shape);
+		//}
 	}
 
 	window->display();
