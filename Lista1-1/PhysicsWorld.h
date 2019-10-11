@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include <Box2D/Box2D.h>
+#include <math.h>
 
 class PhysicsWorld {
 

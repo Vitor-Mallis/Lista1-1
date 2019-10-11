@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Renderer.h"
 #include "PhysicsWorld.h"
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
 
 class Game {
 
@@ -14,6 +14,9 @@ public:
 	void UpdateSFMLEvents();
 	void Update();
 	void Render();
+
+	void DrawBody(b2Body *body);
+	void DrawFixture(b2Fixture *fixture);
 	
 	void Exercicio1();
 
@@ -25,6 +28,8 @@ private:
 	void createWindow();
 
 	PhysicsWorld *world;
+
+	Renderer *renderer;
 
 	sf::RenderWindow *window;
 	sf::Event sfEvent;
