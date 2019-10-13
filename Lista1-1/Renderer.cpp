@@ -29,6 +29,29 @@ void Renderer::DrawCircle(float radius, float centerX, float centerY, float rota
 	window->draw(shape);
 }
 
+void Renderer::DrawPolygon(int vertexCount, float **vertices, float rotation, sf::RenderWindow * window, sf::Color color)
+{
+	sf::ConvexShape shape;
+
+	//shape.setOrigin(16.0f, 16.0f);
+
+	shape.setPointCount(vertexCount);
+
+	for (int i = 0; i < vertexCount; i++) {
+		shape.setPoint(i, sf::Vector2<float>(vertices[i][0], vertices[i][1]));
+	}
+
+	// shape.setPosition(SCALE * bodyIterator->GetPosition().x, SCALE * bodyIterator->GetPosition().y);
+	shape.setRotation(rotation);
+	//shape.setSize(sf::Vector2<float32>(SCALE * bodyIterator->GetTransform().p.x, SCALE * bodyIterator->GetTransform().p.y));
+	shape.setFillColor(sf::Color::Black);
+
+	shape.setOutlineThickness(1.0f);
+	shape.setOutlineColor(sf::Color::Black);
+
+	window->draw(shape);
+}
+
 void Renderer::DrawLine(int vertexCount, float pointStart[2], float pointFinish[2], sf::RenderWindow *window, sf::Color color) {
 	sf::VertexArray points(sf::LinesStrip, vertexCount);
 

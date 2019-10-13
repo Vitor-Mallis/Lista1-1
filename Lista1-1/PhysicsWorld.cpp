@@ -2,12 +2,14 @@
 
 PhysicsWorld::PhysicsWorld()
 {
-	world = new b2World(b2Vec2(0, 9.8f));
+	world = new b2World(b2Vec2(0.0f, 9.8f));
+	world->SetAllowSleeping(false);
 }
 
 PhysicsWorld::PhysicsWorld(float gravity[2])
 {
 	world = new b2World(b2Vec2(gravity[0], gravity[1]));
+	world->SetAllowSleeping(false);
 }
 
 PhysicsWorld::~PhysicsWorld()
@@ -71,7 +73,7 @@ void PhysicsWorld::CreateLine(b2BodyType type, float position[2], float destinat
 	float posY = (position[1] + destination[1] / 2.f);
 	
 	// Calculating the line length
-	float length = (float)sqrt((position[0] - destination[0])*(position[0] - destination[0]) + (position[1] - destination[1])*(position[1] - destination[1]));
+	float length = (float)b2Sqrt((position[0] - destination[0])*(position[0] - destination[0]) + (position[1] - destination[1])*(position[1] - destination[1]));
 	float boxLength = length / scale;
 
 	// Setting the line vertices offset from the center
@@ -91,7 +93,12 @@ void PhysicsWorld::CreateLine(b2BodyType type, float position[2], float destinat
 	body->CreateFixture(&fixture);
 }
 
-b2Body *PhysicsWorld::Step(float32 timeStep, float32 velocityIterations, float32 positionIterations)
+void PhysicsWorld::SetGravity(b2Vec2 gravity)
+{
+	world->SetGravity(gravity);
+}
+
+b2Body *PhysicsWorld::Step(float32 timeStep, int32 velocityIterations, int32 positionIterations)
 {
 	world->Step(timeStep, velocityIterations, positionIterations);
 	world->ClearForces();

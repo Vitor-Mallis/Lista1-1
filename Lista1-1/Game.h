@@ -16,9 +16,8 @@ public:
 	void Render();
 
 	void DrawBody(b2Body *body);
-	void DrawFixture(b2Fixture *fixture);
 	
-	void Exercicio1();
+	void Exercicio1_3();
 
 	void Run();
 
