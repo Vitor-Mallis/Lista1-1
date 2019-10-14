@@ -18,6 +18,10 @@ public:
 
 	void DrawBody(b2Body *body);
 	
+	float32 WorldToBox(float32 value);
+	b2Vec2 WorldToBox(b2Vec2 vector);
+	b2Vec2 *WorldToBox(b2Vec2 *vectors, float32 size);
+
 	void Exercicio1_3();
 	void Exercicio4();
 	void Exercicio5();

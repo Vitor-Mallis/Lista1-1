@@ -1,6 +1,4 @@
 #include "Game.h"
-
-
 #include <iostream>
 
 Game::Game()
@@ -73,7 +71,6 @@ void Game::DrawBody(b2Body * body)
 			float radius = SCALE * circle->m_radius;
 			float centerX = SCALE * center.x;
 			float centerY = SCALE * center.y;
-			//float rotation = fixtureIterator->GetBody()->GetAngle() * 180 / b2_pi;
 			
 			//Calling the SFML renderer
 			renderer->DrawCircle(radius, centerX - radius, centerY - radius, window, sf::Color::Black);
@@ -85,7 +82,7 @@ void Game::DrawBody(b2Body * body)
 			b2PolygonShape* poly = (b2PolygonShape*)fixtureIterator->GetShape();
 			int32 vertexCount = poly->m_count;
 			b2Assert(vertexCount <= b2_maxPolygonVertices);
-			//b2Vec2 vertices[b2_maxPolygonVertices];
+			
 			float **vertices;
 			vertices = new float*[vertexCount];
 			float rotation = fixtureIterator->GetBody()->GetAngle() * 180 / b2_pi;
@@ -137,6 +134,29 @@ void Game::DrawBody(b2Body * body)
 	}
 }
 
+float32 Game::WorldToBox(float32 value)
+{
+	value /= SCALE;
+	return value;
+}
+
+b2Vec2 Game::WorldToBox(b2Vec2 vector)
+{
+	vector.x /= SCALE;
+	vector.y /= SCALE;
+	return vector;
+}
+
+b2Vec2 * Game::WorldToBox(b2Vec2 *vectors, float32 size)
+{
+	for (int i = 0; i < size; i++) {
+		vectors[i].x /= SCALE;
+		vectors[i].y /= SCALE;
+	}
+
+	return vectors;
+}
+
 void Game::Exercicio1_3()
 {	
 	b2Vec2 groundCoords1 = { 5.f, 595.f };
@@ -154,11 +174,10 @@ void Game::Exercicio1_3()
 	b2Vec2 gravityExercicio;
 
 	//Creating the border
-
-	world->CreateLine(b2_staticBody, groundCoords1, groundCoords2, 1.0f, 0.0f, 0.0f, SCALE);
-	world->CreateLine(b2_staticBody, wallRightCoords1, wallRightCoords2, 1.0f, 0.0f, 0.0f, SCALE);
-	world->CreateLine(b2_staticBody, ceilingCoords1, ceilingCoords2, 1.0f, 0.0f, 0.0f, SCALE);
-	world->CreateLine(b2_staticBody, wallLeftCoords1, wallLeftCoords2, 1.0f, 0.0f, 0.0f, SCALE);
+	world->CreateLine(b2_staticBody, WorldToBox(groundCoords1), WorldToBox(groundCoords2), 1.0f, 0.0f, 0.0f);
+	world->CreateLine(b2_staticBody, WorldToBox(wallRightCoords1), WorldToBox(wallRightCoords2), 1.0f, 0.0f, 0.0f);
+	world->CreateLine(b2_staticBody, WorldToBox(ceilingCoords1), WorldToBox(ceilingCoords2), 1.0f, 0.0f, 0.0f);
+	world->CreateLine(b2_staticBody, WorldToBox(wallLeftCoords1), WorldToBox(wallLeftCoords2), 1.0f, 0.0f, 0.0f);
 
 	while (window->isOpen()) {
 
@@ -183,7 +202,7 @@ void Game::Exercicio1_3()
 					float32 boxRestitution = static_cast <float32> (rand()) / static_cast <float32> (RAND_MAX);
 					float32 boxFriction = static_cast <float32> (rand()) / static_cast <float32> (RAND_MAX);
 
-					world->CreateBox(b2_dynamicBody, boxPosition, boxDimensions, boxDensity, boxRestitution, boxFriction, SCALE);
+					world->CreateBox(b2_dynamicBody, WorldToBox(boxPosition), WorldToBox(boxDimensions), boxDensity, boxRestitution, boxFriction);
 				}
 
 				if (sfEvent.key.code == sf::Keyboard::C) {
@@ -198,7 +217,7 @@ void Game::Exercicio1_3()
 					float32 circleRestitution = static_cast <float32> (rand()) / static_cast <float32> (RAND_MAX);
 					float32 circleFriction = static_cast <float32> (rand()) / static_cast <float32> (RAND_MAX);
 
-					world->CreateCircle(b2_dynamicBody, circlePosition, circleRadius, circleDensity, circleRestitution, circleFriction, SCALE);
+					world->CreateCircle(b2_dynamicBody, WorldToBox(circlePosition), WorldToBox(circleRadius), circleDensity, circleRestitution, circleFriction);
 				}
 
 				if (sfEvent.key.code == sf::Keyboard::L) {
@@ -211,7 +230,7 @@ void Game::Exercicio1_3()
 					float32 lineRestitution = static_cast <float32> (rand()) / static_cast <float> (RAND_MAX);
 					float32 lineFriction = static_cast <float32> (rand()) / static_cast <float> (RAND_MAX);
 
-					world->CreateLine(b2_dynamicBody, linePosition, lineDestination, lineDensity, lineRestitution, lineFriction, SCALE);
+					world->CreateLine(b2_dynamicBody, WorldToBox(linePosition), WorldToBox(lineDestination), lineDensity, lineRestitution, lineFriction);
 				}
 			}
 		}
@@ -230,7 +249,7 @@ void Game::Exercicio4() {
 	b2Vec2 groundCoords1 = { 5.f, 595.f };
 	b2Vec2 groundCoords2 = { 795.f, 595.f };
 
-	world->CreateLine(b2_staticBody, groundCoords1, groundCoords2, 0.0f, 0.0f, 1.0f, SCALE);
+	world->CreateLine(b2_staticBody, WorldToBox(groundCoords1), WorldToBox(groundCoords2), 0.0f, 0.0f, 1.0f);
 
 	while (window->isOpen()) {
 
@@ -241,7 +260,7 @@ void Game::Exercicio4() {
 			if (sfEvent.type == sf::Event::KeyPressed) {
 				if (sfEvent.key.code == sf::Keyboard::B) {
 
-					world->CreateBox(b2_dynamicBody, boxCoords, boxDimensions, 5.f, boxRestitution, 1.f, SCALE);
+					world->CreateBox(b2_dynamicBody, WorldToBox(boxCoords), WorldToBox(boxDimensions), 5.f, boxRestitution, 1.f);
 					if (boxRestitution < 1.f) boxRestitution += 0.1f;
 				}
 			}
@@ -260,7 +279,7 @@ void Game::Exercicio5() {
 	b2Vec2 rampCoords1 = { 50.f, 590.f };
 	b2Vec2 rampCoords2 = { 785.f, 150.f };
 
-	world->CreateLine(b2_staticBody, rampCoords1, rampCoords2, 0.0f, 0.0f, 1.0f, SCALE);
+	world->CreateLine(b2_staticBody, WorldToBox(rampCoords1), WorldToBox(rampCoords2), 0.0f, 0.0f, 1.0f);
 
 	while (window->isOpen()) {
 
@@ -271,7 +290,7 @@ void Game::Exercicio5() {
 			if (sfEvent.type == sf::Event::KeyPressed) {
 				if (sfEvent.key.code == sf::Keyboard::B) {
 
-					world->CreateBox(b2_dynamicBody, boxCoords, boxDimensions, 5.f, 0.f, boxFriction, SCALE);
+					world->CreateBox(b2_dynamicBody, WorldToBox(boxCoords), WorldToBox(boxDimensions), 5.f, 0.f, boxFriction);
 					if (boxFriction < 1.f) boxFriction += 0.1f;
 				}
 			}
@@ -292,15 +311,15 @@ void Game::Exercicio6() {
 	b2Vec2 groundCoords1 = { 5.f, 595.f };
 	b2Vec2 groundCoords2 = { 795.f, 595.f };
 
-	world->CreateLine(b2_staticBody, groundCoords1, groundCoords2, 0.0f, 0.0f, 1.0f, SCALE);
+	world->CreateLine(b2_staticBody, WorldToBox(groundCoords1), WorldToBox(groundCoords2), 0.0f, 0.0f, 1.0f);
 
 	for (int i = 0; i < 6; i++) {
-		world->CreateBox(b2_dynamicBody, boxCoords, boxDimensions, 5.f, 0.f, 1.f, SCALE);
+		world->CreateBox(b2_dynamicBody, WorldToBox(boxCoords), WorldToBox(boxDimensions), 5.f, 0.f, 1.f);
 		boxCoords.y -= 40.f;
 	}
 
 	for (int i = 0; i < 6; i++) {
-		world->CreateCircle(b2_dynamicBody, circleCoords, circleRadius, 5.f, 0.f, 1.f, SCALE);
+		world->CreateCircle(b2_dynamicBody, WorldToBox(circleCoords), WorldToBox(circleRadius), 5.f, 0.f, 1.f);
 		circleCoords.y -= 40.f;
 	}
 
@@ -324,11 +343,11 @@ void Game::Exercicio7()
 	b2Vec2 groundCoords1 = { 5.f, 595.f };
 	b2Vec2 groundCoords2 = { 795.f, 595.f };
 
-	world->CreateLine(b2_staticBody, groundCoords1, groundCoords2, 0.0f, 0.0f, 1.0f, SCALE);
+	world->CreateLine(b2_staticBody, WorldToBox(groundCoords1), WorldToBox(groundCoords2), 0.0f, 0.0f, 1.0f);
 
 	for (int i = 0; i < 10; i++) {
 		for (int j = 0; j < 10; j++) {
-			world->CreateBox(b2_dynamicBody, boxCoords, boxDimensions, 5.f, 0.f, 1.f, SCALE);
+			world->CreateBox(b2_dynamicBody, WorldToBox(boxCoords), WorldToBox(boxDimensions), 5.f, 0.f, 1.f);
 			boxCoords.x += 21.f;
 		}
 		boxCoords.y -= 40.f;
@@ -356,14 +375,39 @@ void Game::Exercicio8()
 
 	b2Body *object;
 
-	b2Vec2 mainCoords = { 200.f, 150.f };
-	b2Vec2 mainDimensions = { 20.f, 20.f };
+	//Defining the fixtures of the object
 
-	world->CreateLine(b2_staticBody, groundCoords1, groundCoords2, 0.0f, 0.0f, 1.0f, SCALE);
+	b2Vec2 bodyCoords = { 400.f, 300.f };
 
-	object = world->CreateBody(b2_dynamicBody, b2Vec2(400, 300), SCALE);
+	b2Vec2 mainCoords = { 0.f, 0.f };
+	b2Vec2 mainDimensions = { 100.f, 50.f };
 
-	world->CreateRectangleFixture(mainCoords, 5.f, 0.f, 1.f, mainDimensions, object, SCALE);;
+	b2Vec2 leftWheelCoords = { -50.f, 25.f };
+	float32 leftWheelRadius = 10.f;
+
+	b2Vec2 rightWheelCoords = { 50.f, 25.f };
+	float32 rightWheelRadius = 10.f;
+
+	float32 triangleCount = 3;
+
+	b2Vec2 *triangleCoords = new b2Vec2[triangleCount];
+
+	triangleCoords[0] = b2Vec2(-25.f, -25.f);
+	triangleCoords[1] = b2Vec2(25.f, -25.f);
+	triangleCoords[2] = b2Vec2(0.f, -60.f);
+		
+	//Creating the multi-fixture object
+	world->CreateLine(b2_staticBody, WorldToBox(groundCoords1), WorldToBox(groundCoords2), 0.0f, 0.0f, 1.0f);
+
+	object = world->CreateBody(b2_dynamicBody, WorldToBox(bodyCoords));
+
+	world->CreateRectangleFixture(WorldToBox(mainCoords), 5.f, 0.f, 1.f, WorldToBox(mainDimensions), 0.f, object);;
+
+	world->CreateCircleFixture(WorldToBox(leftWheelCoords), WorldToBox(leftWheelRadius), 5.f, 0.f, 1.f, object);
+
+	world->CreateCircleFixture(WorldToBox(rightWheelCoords), WorldToBox(rightWheelRadius), 5.f, 0.f, 1.f, object);
+
+	world->CreatePolygonFixture(5.f, 0.f, 1.f, WorldToBox(triangleCoords, triangleCount), triangleCount, object);
 
 	while (window->isOpen()) {
 
