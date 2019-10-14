@@ -14,14 +14,14 @@ void Renderer::Render(sf::RenderWindow *window)
 
 }
 
-void Renderer::DrawCircle(float radius, float centerX, float centerY, float rotation, sf::RenderWindow *window, sf::Color color)
+void Renderer::DrawCircle(float radius, float centerX, float centerY, sf::RenderWindow *window, sf::Color color)
 {
 	//Creating the SF shape and drawing it
 	sf::CircleShape shape;
 
 	//shape.setOrigin(16.0f, 16.0f);
 	shape.setPosition(centerX, centerY);
-	shape.setRotation(rotation);
+	//shape.setRotation(rotation);
 	shape.setRadius(radius);
 	//shape.setSize(sf::Vector2<float32>(SCALE * bodyIterator->GetTransform().p.x, SCALE * bodyIterator->GetTransform().p.y));
 	shape.setFillColor(sf::Color::Black);
@@ -29,11 +29,11 @@ void Renderer::DrawCircle(float radius, float centerX, float centerY, float rota
 	window->draw(shape);
 }
 
-void Renderer::DrawPolygon(int vertexCount, float **vertices, float rotation, sf::RenderWindow * window, sf::Color color)
+void Renderer::DrawPolygon(int vertexCount, float **vertices, sf::RenderWindow * window, sf::Color color)
 {
 	sf::ConvexShape shape;
 
-	//shape.setOrigin(16.0f, 16.0f);
+	//shape.setOrigin(shape.getScale().x, shape.getScale().y);
 
 	shape.setPointCount(vertexCount);
 
@@ -42,12 +42,12 @@ void Renderer::DrawPolygon(int vertexCount, float **vertices, float rotation, sf
 	}
 
 	// shape.setPosition(SCALE * bodyIterator->GetPosition().x, SCALE * bodyIterator->GetPosition().y);
-	shape.setRotation(rotation);
+	//shape.setRotation(rotation);
 	//shape.setSize(sf::Vector2<float32>(SCALE * bodyIterator->GetTransform().p.x, SCALE * bodyIterator->GetTransform().p.y));
 	shape.setFillColor(sf::Color::Black);
 
 	shape.setOutlineThickness(1.0f);
-	shape.setOutlineColor(sf::Color::Black);
+	shape.setOutlineColor(sf::Color::Red);
 
 	window->draw(shape);
 }

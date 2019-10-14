@@ -5,14 +5,18 @@ class PhysicsWorld {
 
 public:
 	PhysicsWorld();
-	PhysicsWorld(float gravity[2]);
+	PhysicsWorld(b2Vec2 gravity);
 	~PhysicsWorld();
 	
-	void CreateBody(b2BodyType type, float position[2], float density, float restitution, float friction, float scale, b2Shape *shape);
-	void CreateBox(b2BodyType type, float position[2], float dimensions[2], float density, float restitution, float friction, float scale);
-	void CreateCircle(b2BodyType type, float position[2], float radius, float density, float restitution, float friction, float scale);
-	void CreateLine(b2BodyType type, float position[2], float destination[2], float density, float restitution, float friction, float scale);
+	b2Body *CreateBody(b2BodyType type, b2Vec2 position, float32 scale);
+	b2Body *CreateBox(b2BodyType type, b2Vec2 position, b2Vec2 dimensions, float32 density, float32 restitution, float32 friction, float32 scale);
+	b2Body *CreateCircle(b2BodyType type, b2Vec2 position, float32 radius, float32 density, float32 restitution, float32 friction, float32 scale);
+	b2Body *CreateLine(b2BodyType type, b2Vec2 position, b2Vec2 destination, float32 density, float32 restitution, float32 friction, float32 scale);
 	
+	b2FixtureDef *CreateRectangleFixture(b2Vec2 position, float32 density, float32 restitution, float32 friction, b2Vec2 dimensions, b2Body *body, float32 scale);
+	b2FixtureDef *CreateCircleFixture(b2Vec2 position, float32 density, float32 restitution, float32 friction);
+	b2FixtureDef *CreatePolygonFixture(float32 density, float32 restitution, float32 friction, b2Vec2 *vertices, int32 vertexCount);
+
 	void SetGravity(b2Vec2 gravity);
 
 

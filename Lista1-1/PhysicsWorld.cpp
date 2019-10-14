@@ -6,9 +6,9 @@ PhysicsWorld::PhysicsWorld()
 	world->SetAllowSleeping(false);
 }
 
-PhysicsWorld::PhysicsWorld(float gravity[2])
+PhysicsWorld::PhysicsWorld(b2Vec2 gravity)
 {
-	world = new b2World(b2Vec2(gravity[0], gravity[1]));
+	world = new b2World(b2Vec2(gravity.x, gravity.y));
 	world->SetAllowSleeping(false);
 }
 
@@ -18,70 +18,74 @@ PhysicsWorld::~PhysicsWorld()
 	delete world;
 }
 
-void PhysicsWorld::CreateBody(b2BodyType type, float position[2], float density, float restitution, float friction, float scale, b2Shape *shape)
+b2Body *PhysicsWorld::CreateBody(b2BodyType type, b2Vec2 position, float32 scale)
 {
 	b2BodyDef bodyDef;
 	b2Body *body;
 
-	b2FixtureDef fixture;
-
 	bodyDef.type = type;
-	bodyDef.position = b2Vec2(position[0] / scale, position[1] / scale);
+	bodyDef.position = b2Vec2(position.x / scale, position.y / scale);
 
 	body = world->CreateBody(&bodyDef);
 
-	fixture.shape = shape;
+	return body;
+}
+
+b2Body *PhysicsWorld::CreateBox(b2BodyType type, b2Vec2 position, b2Vec2 dimensions, float32 density, float32 restitution, float32 friction, float32 scale)
+{
+	b2PolygonShape rectangle;
+	b2Body *body;
+
+	rectangle.SetAsBox((dimensions.x / 2) / scale, (dimensions.y / 2) / scale);
+
+	body = CreateBody(type, position, scale);
+
+	b2FixtureDef fixture;
+
+	fixture.shape = &rectangle;
 	fixture.density = density;
 	fixture.restitution = restitution;
 	fixture.friction = friction;
 
 	body->CreateFixture(&fixture);
+
+	return body;
 }
 
-void PhysicsWorld::CreateBox(b2BodyType type, float position[2], float dimensions[2], float density, float restitution, float friction, float scale)
-{
-	
-	b2PolygonShape rectangle;
-	
-	rectangle.SetAsBox((dimensions[0]/2)/scale, (dimensions[1]/2)/scale);
-
-	CreateBody(type, position, density, restitution, friction, scale, &rectangle);
-}
-
-void PhysicsWorld::CreateCircle(b2BodyType type, float position[2], float radius, float density, float restitution, float friction, float scale)
+b2Body *PhysicsWorld::CreateCircle(b2BodyType type, b2Vec2 position, float32 radius, float32 density, float32 restitution, float32 friction, float32 scale)
 {
 	b2CircleShape circle;
+	b2Body *body;
 
 	circle.m_radius = radius/scale;
 
-	CreateBody(type, position, density, restitution, friction, scale, &circle);
+	body = CreateBody(type, position, scale);
+
+	b2FixtureDef fixture;
+
+	fixture.shape = &circle;
+	fixture.density = density;
+	fixture.restitution = restitution;
+	fixture.friction = friction;
+
+	body->CreateFixture(&fixture);
+
+	return body;
 }
 
-void PhysicsWorld::CreateLine(b2BodyType type, float position[2], float destination[2], float density, float restitution, float friction, float scale)
+b2Body *PhysicsWorld::CreateLine(b2BodyType type, b2Vec2 position, b2Vec2 destination, float32 density, float32 restitution, float32 friction, float32 scale)
 {
 	b2EdgeShape line;
-	
-	// CreateBody(type, position, density, restitution, friction, scale, &line);
 
 	b2BodyDef bodyDef;
 	b2Body *body;
 
 	b2FixtureDef fixture;
 
-	// Setting the body position to the the center of the line
-	float posX = (position[0] + destination[0] / 2.f);
-	float posY = (position[1] + destination[1] / 2.f);
-	
-	// Calculating the line length
-	float length = (float)b2Sqrt((position[0] - destination[0])*(position[0] - destination[0]) + (position[1] - destination[1])*(position[1] - destination[1]));
-	float boxLength = length / scale;
-
-	// Setting the line vertices offset from the center
-	line.Set(b2Vec2(position[0] / scale, position[1] / scale), b2Vec2(destination[0] / scale, destination[1] / scale));
-
+	// Setting the line vertices
+	line.Set(b2Vec2(position.x / scale, position.y / scale), b2Vec2(destination.x / scale, destination.y / scale));
 
 	bodyDef.type = type;
-	//bodyDef.position = b2Vec2(posX / scale, posY / scale);
 
 	body = world->CreateBody(&bodyDef);
 
@@ -91,6 +95,57 @@ void PhysicsWorld::CreateLine(b2BodyType type, float position[2], float destinat
 	fixture.friction = friction;
 
 	body->CreateFixture(&fixture);
+	
+	return body;
+}
+
+b2FixtureDef *PhysicsWorld::CreateRectangleFixture(b2Vec2 position, float32 density, float32 restitution, float32 friction, b2Vec2 dimensions, b2Body *body, float32 scale)
+{
+	b2FixtureDef fixture;
+	b2PolygonShape shape;
+	
+	shape.SetAsBox((dimensions.x / 2) / scale, (dimensions.y / 2) / scale);
+	shape.m_centroid.x = position.x / scale;
+	shape.m_centroid.y = position.y / scale;
+
+	fixture.shape = &shape;
+	fixture.density = density;
+	fixture.restitution = restitution;
+	fixture.friction = friction;
+
+	body->CreateFixture(&fixture);
+
+	return &fixture;
+}
+
+b2FixtureDef *PhysicsWorld::CreateCircleFixture(b2Vec2 position, float32 density, float32 restitution, float32 friction)
+{
+	b2FixtureDef *fixture = new b2FixtureDef;
+	b2CircleShape shape;
+
+	shape.m_p = position;
+
+	fixture->shape = &shape;
+	fixture->density = density;
+	fixture->restitution = restitution;
+	fixture->friction = friction;
+
+	return fixture;
+}
+
+b2FixtureDef * PhysicsWorld::CreatePolygonFixture(float32 density, float32 restitution, float32 friction, b2Vec2 *vertices, int32 vertexCount)
+{
+	b2FixtureDef *fixture = new b2FixtureDef;
+	b2PolygonShape shape;
+	
+	shape.Set(vertices, vertexCount);
+
+	fixture->shape = &shape;
+	fixture->density = density;
+	fixture->restitution = restitution;
+	fixture->friction = friction;
+
+	return fixture;
 }
 
 void PhysicsWorld::SetGravity(b2Vec2 gravity)

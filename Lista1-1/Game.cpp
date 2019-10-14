@@ -1,4 +1,6 @@
 #include "Game.h"
+
+
 #include <iostream>
 
 Game::Game()
@@ -21,6 +23,11 @@ Game::~Game()
 	delete renderer;
 }
 
+void Game::UpdateDeltaTime()
+{
+	dt = dtClock.restart().asSeconds();
+}
+
 void Game::UpdateSFMLEvents()
 {
 	//Checking if the user closes the window
@@ -31,13 +38,14 @@ void Game::UpdateSFMLEvents()
 
 void Game::Update()
 {
-	UpdateSFMLEvents();
+	UpdateDeltaTime();
+	//UpdateSFMLEvents();
 }
 
 void Game::Render()
 {
 	//Physics engine update tick
-	b2Body *bodies = world->Step();
+	b2Body *bodies = world->Step(dt);
 
 	window->clear(sf::Color::White);
 
@@ -65,10 +73,10 @@ void Game::DrawBody(b2Body * body)
 			float radius = SCALE * circle->m_radius;
 			float centerX = SCALE * center.x;
 			float centerY = SCALE * center.y;
-			float rotation = fixtureIterator->GetBody()->GetAngle() * 180 / b2_pi;
+			//float rotation = fixtureIterator->GetBody()->GetAngle() * 180 / b2_pi;
 			
 			//Calling the SFML renderer
-			renderer->DrawCircle(radius, centerX, centerY, rotation, window, sf::Color::Black);
+			renderer->DrawCircle(radius, centerX - radius, centerY - radius, window, sf::Color::Black);
 		}
 		break;
 
@@ -90,8 +98,7 @@ void Game::DrawBody(b2Body * body)
 				vertices[i][1] = SCALE * multipliedVertex.y;
 			}
 
-
-			renderer->DrawPolygon(vertexCount, vertices, rotation, window, sf::Color::Black);
+			renderer->DrawPolygon(vertexCount, vertices, window, sf::Color::Black);
 		}
 
 		break;
@@ -132,17 +139,17 @@ void Game::DrawBody(b2Body * body)
 
 void Game::Exercicio1_3()
 {	
-	float groundCoords1[2] = { 5.f, 595.f };
-	float groundCoords2[2] = { 795.f, 595.f };
+	b2Vec2 groundCoords1 = { 5.f, 595.f };
+	b2Vec2 groundCoords2 = { 795.f, 595.f };
 
-	float wallRightCoords1[2] = { 795.f, 595.f };
-	float wallRightCoords2[2] = { 795.f, 5.f };
+	b2Vec2 wallRightCoords1 = { 795.f, 595.f };
+	b2Vec2 wallRightCoords2 = { 795.f, 5.f };
 
-	float ceilingCoords1[2] = { 795.f, 5.f };
-	float ceilingCoords2[2] = { 5.f, 5.f };
+	b2Vec2 ceilingCoords1 = { 795.f, 5.f };
+	b2Vec2 ceilingCoords2 = { 5.f, 5.f };
 
-	float wallLeftCoords1[2] = { 5.f, 5.f };
-	float wallLeftCoords2[2] = { 5.f, 595.f };
+	b2Vec2 wallLeftCoords1 = { 5.f, 5.f };
+	b2Vec2 wallLeftCoords2 = { 5.f, 595.f };
 
 	b2Vec2 gravityExercicio;
 
@@ -167,55 +174,217 @@ void Game::Exercicio1_3()
 				}
 
 				if (sfEvent.key.code == sf::Keyboard::B) {
-					float boxPosition[2] = { rand() % 771 + 20, rand() % 571 + 20 };
-					float boxDimensions[2] = { rand() % 51 + 20, rand() % 51 + 20 };
+					b2Vec2 boxPosition = { static_cast <float32> (rand() % 771 + 20), static_cast <float32> (rand() % 571 + 20) };
+					b2Vec2 boxDimensions = { static_cast <float32> (rand() % 51 + 20), static_cast <float32> (rand() % 51 + 20) };
 
-					//Setting the three paramaters to a number from 0.0f to 1.0f
+					float32 boxDensity = rand() % 19 + 1;
 
-					float boxDensity = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-					float boxRestitution = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-					float boxFriction = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					//Setting these paramaters to a number from 0.0f to 1.0f
+					float32 boxRestitution = static_cast <float32> (rand()) / static_cast <float32> (RAND_MAX);
+					float32 boxFriction = static_cast <float32> (rand()) / static_cast <float32> (RAND_MAX);
 
-					world->CreateBox(b2_dynamicBody, boxPosition, boxDimensions, 1.0f, 0.0f, 0.0f, SCALE);
+					world->CreateBox(b2_dynamicBody, boxPosition, boxDimensions, boxDensity, boxRestitution, boxFriction, SCALE);
 				}
 
 				if (sfEvent.key.code == sf::Keyboard::C) {
-					float circlePosition[2] = { rand() % 771 + 20, rand() % 571 + 20 };
-					float circleRadius = rand() % 26 + 5;
+					b2Vec2 circlePosition = { static_cast <float32> (rand() % 771 + 20), static_cast <float32> (rand() % 571 + 20) };
+					float32 circleRadius = rand() % 26 + 5;
 
-					//Setting the three paramaters to a number from 0.0f to 1.0f
+					
 
-					float circleDensity = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-					float circleRestitution = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-					float circleFriction = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					float32 circleDensity = rand() % 19 + 1;
+
+					//Setting these three paramaters to a number from 0.0f to 1.0f
+					float32 circleRestitution = static_cast <float32> (rand()) / static_cast <float32> (RAND_MAX);
+					float32 circleFriction = static_cast <float32> (rand()) / static_cast <float32> (RAND_MAX);
 
 					world->CreateCircle(b2_dynamicBody, circlePosition, circleRadius, circleDensity, circleRestitution, circleFriction, SCALE);
 				}
 
 				if (sfEvent.key.code == sf::Keyboard::L) {
-					float linePosition[2] = { rand() % 771 + 20, rand() % 571 + 20 };
-					float lineDestination[2] = { rand() % 771 + 20, rand() % 571 + 20 };
+					b2Vec2 linePosition = { static_cast <float32> (rand() % 771 + 20), static_cast <float32> (rand() % 571 + 20) };
+					b2Vec2 lineDestination = { static_cast <float32> (rand() % 771 + 20), static_cast <float32> (rand() % 571 + 20) };
 
-					//Setting the three paramaters to a number from 0.0f to 1.0f
+					float32 lineDensity = rand() % 19 + 1;
 
-					float lineDensity = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-					float lineRestitution = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-					float lineFriction = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					//Setting these paramaters to a number from 0.0f to 1.0f
+					float32 lineRestitution = static_cast <float32> (rand()) / static_cast <float> (RAND_MAX);
+					float32 lineFriction = static_cast <float32> (rand()) / static_cast <float> (RAND_MAX);
 
 					world->CreateLine(b2_dynamicBody, linePosition, lineDestination, lineDensity, lineRestitution, lineFriction, SCALE);
 				}
 			}
 		}
 
-		//Commenting Update for now, because events will be specific to the exercises
-		//Update();
+		Update();
+		Render();
+	}
+}
+
+void Game::Exercicio4() {
+
+	b2Vec2 boxCoords = { 400.f, 300.f };
+	b2Vec2 boxDimensions = { 20.f, 20.f };
+	float32 boxRestitution = 0.f;
+
+	b2Vec2 groundCoords1 = { 5.f, 595.f };
+	b2Vec2 groundCoords2 = { 795.f, 595.f };
+
+	world->CreateLine(b2_staticBody, groundCoords1, groundCoords2, 0.0f, 0.0f, 1.0f, SCALE);
+
+	while (window->isOpen()) {
+
+		//Polling exercise-specific events
+		while (window->pollEvent(sfEvent)) {
+			if (sfEvent.type == sf::Event::Closed) window->close();
+
+			if (sfEvent.type == sf::Event::KeyPressed) {
+				if (sfEvent.key.code == sf::Keyboard::B) {
+
+					world->CreateBox(b2_dynamicBody, boxCoords, boxDimensions, 5.f, boxRestitution, 1.f, SCALE);
+					if (boxRestitution < 1.f) boxRestitution += 0.1f;
+				}
+			}
+		}
+		Update();
+		Render();
+	}
+}
+
+void Game::Exercicio5() {
+
+	b2Vec2 boxCoords = { 775.f, 140.f };
+	b2Vec2 boxDimensions = { 20.f, 20.f };
+	float32 boxFriction = 0.f;
+
+	b2Vec2 rampCoords1 = { 50.f, 590.f };
+	b2Vec2 rampCoords2 = { 785.f, 150.f };
+
+	world->CreateLine(b2_staticBody, rampCoords1, rampCoords2, 0.0f, 0.0f, 1.0f, SCALE);
+
+	while (window->isOpen()) {
+
+		//Polling exercise-specific events
+		while (window->pollEvent(sfEvent)) {
+			if (sfEvent.type == sf::Event::Closed) window->close();
+
+			if (sfEvent.type == sf::Event::KeyPressed) {
+				if (sfEvent.key.code == sf::Keyboard::B) {
+
+					world->CreateBox(b2_dynamicBody, boxCoords, boxDimensions, 5.f, 0.f, boxFriction, SCALE);
+					if (boxFriction < 1.f) boxFriction += 0.1f;
+				}
+			}
+		}
+		Update();
+		Render();
+	}
+}
+
+void Game::Exercicio6() {
+
+	b2Vec2 boxCoords = { 200.f, 555.f };
+	b2Vec2 boxDimensions = { 20.f, 20.f };
+
+	b2Vec2 circleCoords = { 600.f, 555.f };
+	float32 circleRadius = 10.f;
+	
+	b2Vec2 groundCoords1 = { 5.f, 595.f };
+	b2Vec2 groundCoords2 = { 795.f, 595.f };
+
+	world->CreateLine(b2_staticBody, groundCoords1, groundCoords2, 0.0f, 0.0f, 1.0f, SCALE);
+
+	for (int i = 0; i < 6; i++) {
+		world->CreateBox(b2_dynamicBody, boxCoords, boxDimensions, 5.f, 0.f, 1.f, SCALE);
+		boxCoords.y -= 40.f;
+	}
+
+	for (int i = 0; i < 6; i++) {
+		world->CreateCircle(b2_dynamicBody, circleCoords, circleRadius, 5.f, 0.f, 1.f, SCALE);
+		circleCoords.y -= 40.f;
+	}
+
+	while (window->isOpen()) {
+
+		//Polling exercise-specific events
+		while (window->pollEvent(sfEvent)) {
+			if (sfEvent.type == sf::Event::Closed) window->close();
+		}
+
+		Update();
+		Render();
+	}
+}
+
+void Game::Exercicio7()
+{
+	b2Vec2 boxCoords = { 200.f, 555.f };
+	b2Vec2 boxDimensions = { 20.f, 20.f };
+
+	b2Vec2 groundCoords1 = { 5.f, 595.f };
+	b2Vec2 groundCoords2 = { 795.f, 595.f };
+
+	world->CreateLine(b2_staticBody, groundCoords1, groundCoords2, 0.0f, 0.0f, 1.0f, SCALE);
+
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			world->CreateBox(b2_dynamicBody, boxCoords, boxDimensions, 5.f, 0.f, 1.f, SCALE);
+			boxCoords.x += 21.f;
+		}
+		boxCoords.y -= 40.f;
+		boxCoords.x = 200.f;
+	}
+
+	while (window->isOpen()) {
+
+		//Polling exercise-specific events
+		while (window->pollEvent(sfEvent)) {
+			if (sfEvent.type == sf::Event::Closed) window->close();
+		}
+
+		Update();
+		Render();
+	}
+}
+
+void Game::Exercicio8()
+{
+	b2Vec2 objCoords = { 200.f, 555.f };
+
+	b2Vec2 groundCoords1 = { 5.f, 595.f };
+	b2Vec2 groundCoords2 = { 795.f, 595.f };
+
+	b2Body *object;
+
+	b2Vec2 mainCoords = { 200.f, 150.f };
+	b2Vec2 mainDimensions = { 20.f, 20.f };
+
+	world->CreateLine(b2_staticBody, groundCoords1, groundCoords2, 0.0f, 0.0f, 1.0f, SCALE);
+
+	object = world->CreateBody(b2_dynamicBody, b2Vec2(400, 300), SCALE);
+
+	world->CreateRectangleFixture(mainCoords, 5.f, 0.f, 1.f, mainDimensions, object, SCALE);;
+
+	while (window->isOpen()) {
+
+		//Polling exercise-specific events
+		while (window->pollEvent(sfEvent)) {
+			if (sfEvent.type == sf::Event::Closed) window->close();
+		}
+
+		Update();
 		Render();
 	}
 }
 
 void Game::Run()
 {
-	Exercicio1_3();
+	//Exercicio1_3();
+	//Exercicio4();
+	//Exercicio5();
+	//Exercicio6();
+	//Exercicio7();
+	Exercicio8();
 }
 
 void Game::createWindow()
