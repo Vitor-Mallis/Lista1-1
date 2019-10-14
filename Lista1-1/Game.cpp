@@ -3,14 +3,9 @@
 
 Game::Game()
 {
-	world = new PhysicsWorld();
-	window = new sf::RenderWindow();
-	window->setFramerateLimit(60);
-
-	createWindow();
-
-	renderer = new Renderer();
-
+	world = NULL;
+	window = NULL;
+	renderer = NULL;
 	srand(time(NULL));
 }
 
@@ -423,15 +418,80 @@ void Game::Exercicio8()
 
 void Game::Run()
 {
-	//Exercicio1_3();
-	//Exercicio4();
-	//Exercicio5();
-	//Exercicio6();
-	//Exercicio7();
-	Exercicio8();
+	bool exit = 0;
+	int number = -1;
+
+	while (!exit) {
+		std::cout << "Digite o numero do exercicio. Os exercicios 1 a 3 estao juntos no numero 1:\n";
+		std::cout << "0 - Sair do programa\n";
+		std::cout << "1 - Criar caixas, circulos e linhas e alterar a gravidade\n";
+		std::cout << "2 - Para cada caixa criada, aumenta a restituicao\n";
+		std::cout << "3 - Para cada caixa criada na rampa, aumenta a friccao\n";
+		std::cout << "4 - 6 caixas empilhadas e 6 circulos empilhados\n";
+		std::cout << "5 - Muro de 10x10 caixas\n";
+		std::cout << "6 - Objeto com multiplas fixtures\n\n";
+		std::cout << "Digite o numero: ";
+		std::cin >> number;
+		std::cout << std::endl;
+
+		if (std::cin.fail()) {
+			number = -1;
+			std::cin.clear();
+			std::cin.ignore(256, '\n');
+		}
+
+		switch (number) {
+		case 0:
+			exit = 1;
+			break;
+		case 1:
+			createWindow();
+			Exercicio1_3();
+			delete world;
+			number = -1;
+			break;
+		case 2:
+			createWindow();
+			Exercicio4();
+			delete world;
+			number = -1;
+			break;
+		case 3:
+			createWindow();
+			Exercicio5();
+			delete world;
+			number = -1;
+			break;
+		case 4:
+			createWindow();
+			Exercicio6();
+			delete world;
+			number = -1;
+			break;
+		case 5:
+			createWindow();
+			Exercicio7();
+			delete world;
+			number = -1;
+			break;
+		case 6:
+			createWindow();
+			Exercicio8();
+			delete world;
+			number = -1;
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 void Game::createWindow()
 {
+	world = new PhysicsWorld();
+
 	window = new sf::RenderWindow(sf::VideoMode(800, 600), "Física - Lista 1");
+	window->setFramerateLimit(60);
+
+	renderer = new Renderer();
 }

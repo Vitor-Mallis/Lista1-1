@@ -15,7 +15,6 @@ PhysicsWorld::PhysicsWorld(b2Vec2 gravity)
 PhysicsWorld::~PhysicsWorld()
 {
 	world->~b2World();
-	delete world;
 }
 
 b2Body *PhysicsWorld::CreateBody(b2BodyType type, b2Vec2 position)
